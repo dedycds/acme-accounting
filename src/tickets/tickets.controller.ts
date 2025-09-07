@@ -30,6 +30,10 @@ interface TicketDto {
   category: TicketCategory;
 }
 
+/** Globals */
+/** Roles that must be unique per company */
+const UNIQUE_ROLES = [UserRole.corporateSecretary, UserRole.director];
+
 /**
  * Controller for managing tickets in the ACME accounting system
  * Handles ticket creation, retrieval, and assignment logic
@@ -45,24 +49,22 @@ export class TicketsController {
     return await Ticket.findAll({ include: [Company, User] });
   }
 
-
-  
   /**
    * Creates a new ticket with automatic assignee selection based on ticket type and business rules
-   * 
+   *
    * Business Rules:
    * - Management Report tickets are assigned to accountants
    * - Registration Address Change tickets are assigned to corporate secretaries
    * - If no corporate secretary exists for registration address change, falls back to director
    * - Only one registration address change ticket per company is allowed
-   * - Corporate secretaries must be unique (only one per company)
-   * 
+   * - Corporate secretaries or directors must be unique (only one per company)
+   *
    * @param {newTicketDto} newTicketDto - The ticket creation data
    * @returns {Promise<TicketDto>} The created ticket data
    * @throws {ConflictException} When:
    *   - Duplicate registration address change ticket exists
    *   - No suitable assignee found for the ticket type
-   *   - Multiple corporate secretaries exist (business rule violation)
+   *   - Multiple corporate secretaries or directors exist (business rule violation)
    */
   @Post()
   async create(@Body() newTicketDto: newTicketDto) {
@@ -114,8 +116,8 @@ export class TicketsController {
         `Cannot find user with role ${userRole} to create a ticket`,
       );
 
-    // Business rule: Corporate secretaries must be unique per company
-    if (userRole === UserRole.corporateSecretary && assignees.length > 1)
+    // Business rule: Corporate secretaries or directors must be unique per company
+    if (UNIQUE_ROLES.includes(userRole) && assignees.length > 1)
       throw new ConflictException(
         `Multiple users with role ${userRole}. Cannot create a ticket`,
       );
