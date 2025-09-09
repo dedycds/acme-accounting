@@ -17,9 +17,7 @@ export class ReportsController {
   @Post()
   @HttpCode(201)
   async generate() {
-    // Start all report generation processes in parallel
     await this.reportsService.generate();
-
     return { message: 'finished' };
   }
 }
