@@ -16,12 +16,17 @@ export class ReportsController {
 
   @Post()
   @HttpCode(201)
-  generate() {
-    Promise.all([
+  async generate() {
+    // Start all report generation processes in parallel
+    await Promise.all([
       this.reportsService.accounts(),
       this.reportsService.yearly(),
-      this.reportsService.fs()
-    ])
+      this.reportsService.fs(),
+    ]).catch((error) => {
+      // Log error but don't throw to avoid breaking the response
+      console.error('Error in report generation:', error);
+    });
+
     return { message: 'starting' };
   }
 }
