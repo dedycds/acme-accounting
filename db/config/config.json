@@ -13,6 +13,7 @@
     "port": 5590,
     "username": "user",
     "password": "password",
-    "database": "task-test"
+    "database": "task-test",
+    "logging": false
   }
 }

@@ -12,7 +12,7 @@ beforeEach(async () => {
 });
 
 export async function cleanTables() {
-  await Test.createTestingModule({
+  const module = await Test.createTestingModule({
     imports: [DbModule],
   }).compile();
 
@@ -20,6 +20,9 @@ export async function cleanTables() {
   for (const model of models) {
     await cleanTable(model);
   }
+
+  // Close the module to clean up database connections
+  await module.close();
 
   async function cleanTable<T extends Model>(model: ModelCtor<T>) {
     const options: DestroyOptions = {
