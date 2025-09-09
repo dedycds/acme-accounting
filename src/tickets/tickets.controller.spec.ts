@@ -198,10 +198,11 @@ describe('TicketsController', () => {
           role: UserRole.corporateSecretary,
           companyId: company.id,
         });
-        const existingTicket = await Ticket.create({
+        await Ticket.create({
           companyId: company.id,
           type: TicketType.registrationAddressChange,
           assigneeId: user.id,
+          status: TicketStatus.open
         });
 
         await expect(

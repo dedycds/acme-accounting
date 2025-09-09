@@ -86,7 +86,7 @@ export class TicketsController {
     // Business rule: Only one registrationAddressChange ticket per company
     if (type === TicketType.registrationAddressChange) {
       const existingTicket = await Ticket.findOne({
-        where: { companyId, type },
+        where: { companyId, type, status: TicketStatus.open},
         attributes: ['id'],
       });
 
