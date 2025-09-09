@@ -14,9 +14,10 @@ import { TicketsService } from './tickets.service';
 
 describe('TicketsController', () => {
   let controller: TicketsController;
+  let module: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       controllers: [TicketsController],
       providers: [TicketsService],
       imports: [DbModule],
@@ -25,11 +26,14 @@ describe('TicketsController', () => {
     controller = module.get<TicketsController>(TicketsController);
   });
 
+  afterEach(async () => {
+    if (module) {
+      await module.close();
+    }
+  });
+
   it('should be defined', async () => {
     expect(controller).toBeDefined();
-
-    const res = await controller.findAll();
-    console.log(res);
   });
 
   describe('create', () => {
