@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { performance } from 'perf_hooks';
 import { REPORTS_CONFIG, ReportsConfig } from './reports.config';
+import async from 'async';
 
 /**
  * ReportsService generates accounting reports from CSV journals found in the tmp directory.
@@ -60,7 +61,7 @@ export class ReportsService {
     try {
       const files = await fs.readdir(tmpDir, { withFileTypes: true });
 
-      for (const file of files) {
+      await async.mapLimit(files, 10, async (file) => {
         if (file.isFile() && file.name.endsWith('.csv')) {
           const filePath = path.join(tmpDir, file.name);
           const content = await fs.readFile(filePath, 'utf-8');
@@ -85,7 +86,7 @@ export class ReportsService {
             }
           }
         }
-      }
+      });
     } catch (error) {
       this.states.accounts = 'error';
       this.states.fs = 'error';
